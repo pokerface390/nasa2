@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Exoplanetas</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: url('fondo.jpg') no-repeat center center fixed; 
+            background-size: cover;
+        }
+        #character-speech {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+        }
+        #icon-container {
+            position: absolute;
+            z-index: 10;
+            top: 100px;
+            left: 100px;
+            display: flex;
+            flex-direction: column;
+        }
+        #draggable-spaceship {
+            width: 50px;
+            height: 50px;
+            cursor: grab;
+            margin-bottom: 10px;
+        }
+        #new-icon {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+        }
+        #image-chat-container {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+        #chatbot {
+            width: 250px;
+            height: 200px;
+            background-color: rgba(0, 0, 0, 0.9);
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 5px;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            color: white;
+            overflow-y: auto;
+            max-height: 140px;
+        }
+        #chat-input {
+            margin-top: 5px;
+            display: flex;
+        }
+        #chat-input input {
+            flex: 1;
+            padding: 2px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        #chat-input button {
+            padding: 2px 5px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        #chat-input button:hover {
+            background-color: #0056b3;
+        }
+        #chat-button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        #chat-button:hover {
+            background-color: #0056b3;
+        }
+        .tool-button {
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        /* Estilos para los paneles de información */
+        #info-panel {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 15px;
+            border-radius: 10px;
+            max-width: 300px;
+            z-index: 10;
+        }
+        #new-image-container {
+            position: absolute;
+            top: 250px;
+            right: 20px;
+            z-index: 10;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 15px;
+            border-radius: 10px;
+            color: white;
+            max-width: 300px;
+        }
+        #new-image-container p {
+            margin-top: 10px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+        #new-image {
+            width: 150px;
+            height: auto;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="icon-container">
+        <img id="draggable-spaceship" src="i.png" draggable="true" alt="Nave Espacial" title="Mover la nave espacial por el mapa.">
+        <img id="new-icon" src="astrology_5101319.png" alt="Nuevo Icono" onclick="toggleConstellations()" title="Mostrar y ocultar constelaciones en el mapa.">
+        <img src="chat.png" alt="Habilitar Chat" class="tool-button" onclick="toggleChat()" title="Habilitar chat.">
+        <img src="crea.png" alt="Diseño" class="tool-button" onclick="designFunction()" title="Abrir herramientas de diseño.">
+        <img src="medir2.png" alt="Medir" class="tool-button" onclick="measureFunction()" title="Abrir herramientas de medición.">
+    </div>
+    
+    <div id="info-panel">
+        <h2>Información del Exoplaneta</h2>
+        <div id="planet-info">Selecciona un planeta para ver su información.</div>
+    </div>
+    
+    <div id="image-chat-container">
+        <img src="re.png" alt="Imagen a la derecha" style="width: 150px; height: auto;">
+        <div id="chatbot">
+            <div id="chat-messages">
+                <div>Bot: ¡Hola! ¿Cómo estás hoy?</div>
+            </div>
+            <div id="chat-input">
+                <input type="text" placeholder="Escribe tu mensaje..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Enviar</button>
+            </div>
+        </div>
+        <button id="close-chat-button" onclick="toggleChat()">Cerrar Chat</button>
+    </div>
+    <div id="planet-info"></div>
+    <div id="info-panel"></div>
+    
+   
+
+    <script type="module" src="main.js"></script>
+    <script>
+        function toggleChat() {
+            const imageChatContainer = document.getElementById('image-chat-container');
+            const chatButton = document.getElementById('chat-button');
+            const closeChatButton = document.getElementById('close-chat-button');
+
+            if (imageChatContainer.style.display === "none" || imageChatContainer.style.display === "") {
+                imageChatContainer.style.display = "flex";
+                chatButton.style.display = "none";
+            } else {
+                imageChatContainer.style.display = "none";
+                chatButton.style.display = "block";
+            }
+        }
+
+        function sendMessage() {
+            const input = document.querySelector('#chat-input input');
+            const message = input.value;
+            if (message.trim()) {
+                const chatMessages = document.getElementById('chat-messages');
+                chatMessages.innerHTML += `<div>Usuario: ${message}</div>`;
+                input.value = '';
+                
+                const response = getChatbotResponse(message);
+                chatMessages.innerHTML += `<div>Bot: ${response}</div>`;
+                
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function getChatbotResponse(userMessage) {
+            return "Esta es una respuesta predeterminada a tu pregunta.";
+        }
+    </script>
+</body>
+</html>
